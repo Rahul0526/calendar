@@ -1,0 +1,10 @@
+[18-Apr-2017 04:59:52 America/Chicago] PHP Fatal error:  Call to a member function parse_file() on a non-object in /home/augurstech/calendar.augurstech.com/application/controllers/Welcome.php on line 115
+[05-May-2017 07:08:19 America/Chicago] PHP Fatal error:  Call to undefined method Employee::deleteTask() in /home/augurstech/calendar.augurstech.com/application/controllers/Employee.php on line 370
+[05-May-2017 07:09:12 America/Chicago] PHP Fatal error:  Call to undefined method Employee::deleteTask() in /home/augurstech/calendar.augurstech.com/application/controllers/Employee.php on line 370
+[05-May-2017 07:31:26 America/Chicago] PHP Fatal error:  Call to undefined method Employee::deleteTask() in /home/augurstech/calendar.augurstech.com/application/controllers/Employee.php on line 370
+[06-May-2017 04:12:42 America/Chicago] PHP Fatal error:  Function name must be a string in /home/augurstech/calendar.augurstech.com/application/views/admin/order-view.php on line 55
+[06-May-2017 04:18:16 America/Chicago] PHP Fatal error:  Function name must be a string in /home/augurstech/calendar.augurstech.com/application/views/admin/order-view.php on line 51
+[06-May-2017 04:27:40 America/Chicago] PHP Fatal error:  Function name must be a string in /home/augurstech/calendar.augurstech.com/application/views/admin/user-view.php on line 55
+[06-May-2017 04:28:11 America/Chicago] PHP Fatal error:  Function name must be a string in /home/augurstech/calendar.augurstech.com/application/views/admin/user-view.php on line 55
+[06-May-2017 04:30:32 America/Chicago] PHP Fatal error:  Function name must be a string in /home/augurstech/calendar.augurstech.com/application/views/admin/order-view.php on line 51
+[20-May-2017 02:29:12 America/Chicago] PHP Parse error:  syntax error, unexpected end of file, expecting variable (T_VARIABLE) or ${ (T_DOLLAR_OPEN_CURLY_BRACES) or {$ (T_CURLY_OPEN) in /home/augurstech/calendar.augurstech.com/application/controllers/Admin.php on line 176

@@ -1,0 +1,201 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 5 Oct, 2016, 2:27:23 PM
+    Author     : MAT
+*/
+
+
+body::-webkit-scrollbar-track,div::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+        
+}
+
+body::-webkit-scrollbar,div::-webkit-scrollbar
+{
+	width: 6px;
+        height: 6px;
+	background-color: #F5F5F5;
+}
+
+body::-webkit-scrollbar-thumb,div::-webkit-scrollbar-thumb
+{
+	background-color: #000000;
+}
+.dataTables_wrapper.no-footer .dataTables_scrollBody {
+    border-bottom: 1px solid #a3a1a3;
+}
+.customTable tbody tr{
+  color:#ff6c6c;
+}
+.customTable tbody tr td:nth-child(1){
+  color:#000;
+}
+
+.home-row{
+  margin-top: 96px;
+}
+.home-row .panel-default>.panel-heading{
+  font-size: 1.5vw;
+  text-align: center;
+  padding-bottom: 0;
+}
+.panel-default>.panel-heading{
+/*  background-color: #fff;*/
+}
+.panel-title {
+  font-size: 1.5vw;
+    color: #787878;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: center;
+        padding-bottom: 10px;
+}
+.filter-row{
+  margin: 10px 0;
+}
+.filter-box .form-group .form-control {
+   width: 168px !important;
+   font-size: 12px;
+}
+.filter-link {
+  text-align: center;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    background-color: #f59910;
+    line-height: 50px;
+    color: #fff;
+        margin-top: -8px;
+}
+.filter-link span{
+  color: #fff;
+}
+.modal-ax {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('../images/loader.gif') 
+                50% 50% 
+                no-repeat;
+}
+
+/* When the body has the loading class, we turn
+   the scrollbar off with overflow:hidden */
+body.loading {
+    overflow: hidden;   
+}
+
+/* Anytime the body has the loading class, our
+   modal element will be visible */
+body.loading .modal-ax {
+    display: block;
+}
+
+.table-bordered thead tr th{
+  padding-right: 0px;
+  padding: 5px;
+  font-size: 12px;
+  text-align: center;
+}
+.table-bordered tbody tr td{
+  padding: 2px;
+  
+}
+table.dataTable thead > tr > th {
+    padding-right: 20px;
+}
+.text-22{
+  font-size: 22px;
+}
+.m-bottom-50{
+  margin-bottom: 50px
+}
+.terms{
+  font-size: 11px;
+    font-family: monospace;
+}
+.disable-click{
+  pointer-events: none;
+  cursor: default;
+}
+.page-footer{
+  position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+p{
+  font-size: 18px;
+}
+.form-inline .form-control {
+  padding:0;
+}
+.form-inline .form-control select{
+  position: static !important;
+}
+.filter-label span{
+      padding: 10px;
+    color: #fb9464;
+    font-size: 20px;
+}
+
+.text-left-p{ text-align:left !important;}
+
+.Registation_Box{ 
+	background-color:#ddd !important; 
+	border:2px solid #f7814d !important;
+}
+.navbar-inverse{ 
+	/*background-color:transparent !important; 
+	border-color:transparent !important;*/
+	
+	background-color:#234267 !important; 
+	border-color:#234267; 
+	border-bottom:2px solid #f7814d !important;
+}
+
+.navbar-inverse .navbar-brand, .navbar-inverse .navbar-brand{ color: #fff !important;}
+
+.nav>li>a:hover, .nav>li>a:focus{ 
+	/*background-color:#3f516c !important; color:#fff !important;*/
+	background-color:#fff !important; color:#ff6c6c !important;
+}
+
+/*.lock2{ 
+	background-color:#3f516c !important; 
+	border-color:#3f516c !important;}*/
+	
+.text-primary{ color:#fff !important;}
+
+.sing-in{    
+	background-color: #c52d2f !important;
+    color: #fff !important;}
+	
+	
+.col-centered{ float:none !important; margin:0 auto !important;}
+.center1 h2{ 
+	text-align:center; 
+	font-size:30px; 
+	margin-bottom:10px;
+	font-size: 32px;
+    margin-top: 0;
+    margin-bottom: 20px !important;
+    font-family: 'Open Sans', sans-serif !important;
+    color: #40516c !important;
+}
+
+
+
+
+
+

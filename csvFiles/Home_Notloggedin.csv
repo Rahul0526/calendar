@@ -1,0 +1,5 @@
+﻿Number,Ticker,Current Close,Technical Indicator,Note
+2,ACNB,29.85,Simple Average,50 / 200 day cross  - 5 / 10 / 20 day triple cross  - 13 / 48 day cross  - moving average convergence divergence within 1.00% -- stock is down -4% the last month
+1,ACNB,29.85,,Relative Stregnth Index:  37 -  Stochastic Oscillator:  17 -- stock is down -4% the last month
+2,AGD,9.29,Simple Average,50 / 200 day cross  - 5 / 10 / 20 day triple cross  - 13 / 48 day cross  - moving average convergence divergence within 0.00% -- stock is down -1% for the day
+1,AGD,9.29,,Relative Stregnth Index:  61 -  Stochastic Oscillator:  50 -- stock is down -1% for the day
