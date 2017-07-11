@@ -72,14 +72,14 @@ include_once 'left-menu.php';
                 <div class="form-group">
                 <label for="l_name" class="col-sm-20 control-label">No. Days*</label>
                 <div class="col-sm-40">                  
-                  <input id="l_name" maxlength="100" type="text" class="form-control" required="" placeholder="days" name="days" value="<?php echo $milestone->days; ?>"/>
+                  <input id="l_name" maxlength="100" type="text" class="form-control numbers-only allow-decimal" required="" placeholder="days" name="days" value="<?php echo $milestone->days; ?>"/>
                   <?php echo form_error('days'); ?> </div>
               </div>
                  <div class="form-group">
                   <label for="email" class="col-sm-20 control-label">Weight*</label>
 
                   <div class="col-sm-40">
-                  <input maxlength="100" type="text" required="required" class="form-control" placeholder="weight" name="weight" value="<?php echo $milestone->weight; ?>" />
+                  <input maxlength="100" type="text" required="required" class="form-control numbers-only allow-decimal" placeholder="weight" name="weight" value="<?php echo $milestone->weight; ?>" />
           		  <?php echo form_error('weight'); ?>
                   </div>
                 </div>
