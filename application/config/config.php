@@ -50,8 +50,8 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 date_default_timezone_set('America/Chicago');
 
+$config['base_url'] = 'http://localhost/calander/';
 // $config['base_url'] = 'http://calendar.augurstech.com/';
-$config['base_url'] = 'http://192.168.0.231/calender';
 
 //error_reporting(0);
 
@@ -77,7 +77,8 @@ $config['base_url'] = 'http://192.168.0.231/calender';
 
 */
 
-$config['index_page'] = 'index.php';
+// $config['index_page'] = 'index.php';
+$config['index_page'] = '';
 
 
 
@@ -111,7 +112,8 @@ $config['index_page'] = 'index.php';
 
 */
 
-$config['uri_protocol']	= 'REQUEST_URI';
+$config['uri_protocol']	= 'AUTO';
+// $config['uri_protocol']	= 'REQUEST_URI';
 
 
 

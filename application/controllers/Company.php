@@ -35,91 +35,194 @@ class Company extends CI_Controller {
 	}
 
 	public function index() {
-	$data['title'] = "Home";
+		$data['title'] = "Home";
 		$this->authCheck();
-	$userId = $this->session->userdata('uid');
-	$milestones= $this->db_model->getData('au_milestones',array('company_id'=>$userId)); 
-	$Employee= $this->db_model->getData('au_users',array('company_id'=>$userId,'type'=>'Employee'));
-	$emplyolist=array(array('key'=>'0','label'=>'--Select--'));
-	if(!empty($Employee)){
-		foreach($Employee as $emp){
-			$emplyolist[]=array('key'=>$emp->id,'label'=>$emp->f_name.' '.$emp->l_name);		
+		$userId = $this->session->userdata('uid');
+		$milestones= $this->db_model->getData('au_milestones',array('company_id'=>$userId)); 
+		$Employee= $this->db_model->getData('au_users',array('company_id'=>$userId,'type'=>'Employee'));
+		$emplyolist=array(array('key'=>'0','label'=>'--Select--'));
+		if(!empty($Employee)){
+			foreach($Employee as $emp){
+				$emplyolist[]=array('key'=>$emp->id,'label'=>$emp->f_name.' '.$emp->l_name);		
+			}
 		}
-	}
-	$milestoelist=array(array('key'=>'0','label'=>'--Select--'));
-	if(!empty($milestones)){
-		foreach($milestones as $mlt){
-			$milestoelist[]=array('key'=>$mlt->id,'label'=>$mlt->Title);		
+		// $milestoelist=array(array('key'=>'0','label'=>'--Select--'));
+		if(!empty($milestones)){
+			foreach($milestones as $mlt){
+				$milestoelist[]=array('key'=>$mlt->id,'label'=>$mlt->Title);		
+			}
 		}
-	}
-	$data['Employee']=$emplyolist;
-	$data['Milestoelist']=$milestoelist;
+		$data['Employee']=$emplyolist;
+		$data['Milestoelist']=$milestoelist;
 		$this->load->view('company/dashboard',$data);
 	}
 	
-	public function taskManagement(){
-	 $this->authCheck();
-	 $parameters=$_REQUEST;
-	 $userId = $this->session->userdata('uid');
-	 //print_r($parameters); 
-		//get data	 
-		if(isset($parameters['from']) and isset($parameters['to'])){		
+	public function taskManagement() {
+		$this->authCheck();
+		$parameters=$_REQUEST;
+		$userId = $this->session->userdata('uid');
+		// print_r($parameters); 
+		// die;
+		// get data	 BKP
+		if(isset($parameters['from']) and isset($parameters['to'])) { 
 			$tasks = $this->db_model->getData('au_tasks',array('company_id'=>$userId,'start_date>='=>$parameters['from'],'end_date<='=>$parameters['to']));
-		$outputdata=array();
-		if(!empty($tasks)){
-		foreach($tasks as $task){
-			$outputdata[]=array('start_date'=>$task->start_date,
-								'end_date'=>$task->end_date,
-								'text'=>$task->title,
-								'event_id'=>$task->id,
-								'employee'=>$task->employee_id,
-								'milestone'=>$task->milestone_id
-								);
+			$outputdata=array();
+			if(!empty($tasks)){
+				foreach($tasks as $task){
+					$taskType = $task->highlighted;
+					$highlighted = "";
+					if($taskType != "0") { // default
+						if($taskType == "1") {
+							$highlighted = "highlighted";
+						} else if ($taskType == "2") {
+							$highlighted = "holiday";
+						}
+					}
+					// $highlighted = $task->highlighted == "0" ? "" : "highlighted";
+					$outputdata[]=array(
+						'start_date'=>$task->start_date,
+						'end_date'=>$task->end_date,
+						'text'=>$task->title,
+						'event_id'=>$task->id,
+						'employee'=>$task->employee_id,
+						'milestone'=>$task->milestone_id,
+						// 'weight'+$task->milestone_id=>$weight,
+						'subject'=>$highlighted
+					);
+				}
+				// print_r($outputdata);
+				echo json_encode($outputdata);
+				// die;
+			}
 		}
-		//print_r($outputdata);
-		echo json_encode($outputdata);
-		}
-		}
-		
+
+		$company_id = $this->session->userdata('uid');
+		$a = $this->db_model->getData('au_weekends', array('companyId'=>$company_id),'','');
+		$weekOffs = $a[0]->weekOffs;
+		$weekDays = array(1=>"Monday",2=>"Tuesday",3=>"Wednesday",4=>"Thursday",5=>"Friday",6=>"Saturday",7=>"Sunday");
+
 		//insert tasks
 		$insertedData=$_POST;
-	 // print_r($insertedData);die;
-		if(@$insertedData[0]=='inserted'){
+	 	// print_r($insertedData);die;
+		if(@$insertedData[0]=='inserted') {
 			$taskdata=array();
 			//procss data
-			foreach($insertedData as $kt=>$rowd){
+			foreach($insertedData as $kt=>$rowd) {
 				if($kt==0 or $kt=='ids')
 				continue;
 				$rowx=explode("_",$kt);			  
 				$taskdata[$rowx[0]][$rowx[1]]=$rowd;			  
 			}
+			// print_r($taskdata);die;
 		 
-			foreach($taskdata as $cid=>$task){
-			//get milestone records 
-			$milestones = $this->db_model->getData('au_milestones',array('company_id'=>$userId,'id'=>$task['milestone']));  
-			//print_r($milestones);die;
-			$daysMilstone=$milestones[0]->days;
-			for($i=0;$i<=$daysMilstone;$i++){		
-				$taskarray=array();
-				
-				$startDate=date('Y-m-d H:i:s', strtotime($task['start']. " + $i days"));
-				$endDate=date('Y-m-d H:i:s', strtotime($task['end']. " + $i days"));
-				
-				$taskarray['cid']=$cid;
-				$taskarray['task_group']=$cid;
-				$taskarray['company_id']=$userId;
-				$taskarray['start_date']=$startDate;
-				$taskarray['end_date']=$endDate;
-				$taskarray['title']=$task['text'];
-				$taskarray['employee_id']=$task['employee'];
-				$taskarray['milestone_id']=$task['milestone'];					  
-				$this->db_model->SaveForm('au_tasks',$taskarray);
-			}
-			echo $cid;
+			foreach($taskdata as $cid=>$task) {
+				//get milestone records 
+				// print_r($task);
+				// $milestones = array_map('intval', explode(",", $task['milestone']));
+				$milestones = array();
+				foreach($task as $key=>$value) {
+					if(strpos($key, "milestone") !== false && $value !== "false") {
+						$arr = explode("milestone", $key);
+						$a = array(
+							"priority"=>$task["priority".$arr[1]],
+							"key" => $arr[1], 
+							"value"=> $task["weight".$arr[1]]
+						);
+						array_push($milestones, $a);
+					}
+				}
+				sort($milestones);
+
+				//  Checking if job exceeds given time frame
+				$FinalDays = 0;
+				$workingDays = 0;
+				foreach ($milestones as $key => $milestone) {
+					$milestonesDet = $this->db_model->getData('au_milestones',array('company_id'=>$userId,'id'=>$milestone["key"]));
+					$weight = (int)$milestonesDet[0]->weight;
+					$addDays = round(((int)$milestone["value"])/$weight);
+					$daysMilstone=$milestonesDet[0]->days;
+					$totalDays = ($daysMilstone + $addDays);
+					$workingDays += $totalDays;
+					for($i=0;$i<$totalDays;$i++) {		
+						$taskarray=array();
+						$day = strtotime($task['end']. " - $i days");
+						$dayNo = date("N", $day);
+						if(strpos($weekOffs, $dayNo) !== false) {
+							$totalDays++;
+						}
+						$FinalDays++;
+					}
+				}
+				$startDate = new DateTime(date('Y-m-d H:i:s', strtotime($task['end']. " - $FinalDays days")));
+				$endDate = new DateTime($task['end']);
+				$selectedStartDate = new DateTime($task['start']);
+
+				if($startDate < $selectedStartDate) {
+					$interval = $startDate->diff($selectedStartDate);
+					echo "Job exceeds the date range by " . floor($interval->format('%R%a days')) . " Day(s). Please extend date range.\n";
+					$days = $startDate->diff($endDate, true)->days;
+					echo "\nWorking Days: $workingDays";
+					foreach (explode(',', $weekOffs) as $key => $value) {
+						$holiday = intval($days / 7) + ($startDate->format('N') + $days % 7 >= $value);
+						echo "\n".$weekDays[$value].": $holiday";
+						
+					}
+					// $saturdays = intval($days / 7) + ($startDate->format('N') + $days % 7 >= 6);
+
+					// echo "\n\nStart Date: ".$startDate->format('Y-m-d H:i:s');
+					// echo "\nEnd Date: ".$endDate->format('Y-m-d H:i:s');
+					// echo "\nStart Date Given: ".date('Y-m-d H:i:s', strtotime($task['start']));
+					// echo "\nStart Date Given: ".date('Y-m-d H:i:s', strtotime($task['start']));
+					// echo "\nEnd Date Given: ".date('Y-m-d H:i:s', strtotime($task['end']));
+					// echo "\nSaturdays: $saturdays";
+					echo "\nTotal Days: $FinalDays";
+					die;
+				}
+
+				foreach ($milestones as $key => $milestone) {
+					$milestonesDet = $this->db_model->getData('au_milestones',array('company_id'=>$userId,'id'=>$milestone["key"]));
+					$weight = (int)$milestonesDet[0]->weight;
+					$addDays = round(((int)$milestone["value"])/$weight);
+					// echo '<br/>' . $milestone["key"] . " - " . $milestone["value"] . " - " . $milestones[0]->days . " - " . $addDays;
+					$daysMilstone=$milestonesDet[0]->days;
+					$totalDays = $daysMilstone + $addDays;
+					for($i=0;$i<$totalDays;$i++) {		
+						$taskarray=array();
+						$day = strtotime($task['end']. " - $i days");
+						$dayNo = date("N", $day);
+						if(strpos($weekOffs, $dayNo) !== false) {
+							if($i < $daysMilstone) $daysMilstone++;
+							$totalDays++;
+							$taskarray['highlighted']=2; // excluding holidays
+						} else {
+							if($i < $daysMilstone) {
+								$taskarray['highlighted']=0;
+							} else {
+								$taskarray['highlighted']=1; // adding extra days
+							}
+						}
+
+						// $startDate=date('Y-m-d H:i:s', strtotime($task['start']. " + $i days"));
+						$startDate=date('Y-m-d', strtotime($task['end']. " - $i days")) . " " . date('H:i:s', strtotime($task['start']));
+						$endDate=date('Y-m-d H:i:s', strtotime($task['end']. " - $i days"));
+						
+						$taskarray['cid']=$cid;
+						$taskarray['task_group']=$cid;
+						$taskarray['company_id']=$userId;
+						$taskarray['start_date']=$startDate;
+						$taskarray['end_date']=$endDate;
+						$taskarray['title']=$task['text'];
+						$taskarray['employee_id']=$task['employee'];
+						$taskarray['milestone_id']=$milestone["key"];
+						// print_r($taskarray); die;
+						$this->db_model->SaveForm('au_tasks',$taskarray);
+					}
+				}
+				echo $cid;
 			}
 		}
 		//update task
-		if(@$insertedData[0]=='updated'){
+		if(@$insertedData[0]=='updated') {
 			$taskdata=array();
 			//procss data
 			foreach($insertedData as $kt=>$rowd){
@@ -129,7 +232,7 @@ class Company extends CI_Controller {
 				$taskdata[$rowx[0]][$rowx[1]]=$rowd;			  
 			}
 		
-			foreach($taskdata as $cid=>$task){
+			foreach($taskdata as $cid=>$task) {
 			$taskarray=array();
 			$taskarray['cid']=$cid;
 			$taskarray['company_id']=$userId;
@@ -147,7 +250,7 @@ class Company extends CI_Controller {
 			}
 		}
 		//delete task
-		if(@$insertedData[0]=='deleted'){
+		if(@$insertedData[0]=='deleted') {
 			foreach($insertedData as $kt=>$rowd){
 				if($kt==0 or $kt=='ids')
 				continue;
@@ -174,10 +277,39 @@ class Company extends CI_Controller {
 	
 	public function deleteTaskwithCid($cid = "") {
 		$this->authCheck();
-	$userId = $this->session->userdata('uid');
-	 $this->db_model->DeleteRow('au_tasks', array('cid' => $cid,'company_id'=>$userId));      
+		$userId = $this->session->userdata('uid');
+		$this->db_model->DeleteRow('au_tasks', array('cid' => $cid,'company_id'=>$userId));      
 	}
 
+	public function holidays() {
+		$company_id = $this->session->userdata('uid');
+		$result = $this->db_model->getData('au_weekends', array('companyId'=>$company_id),'','');
+		$data = array();
+		$data["holidays"] = $result[0];
+		// print_r($data);
+		// die;
+		$this->load->view('Company/holidays', $data);
+	}
+
+	public function addHolidays() {
+		$days = $_GET["days"];
+		$company_id = $this->session->userdata('uid');
+		$data['weekOffs'] = $days;
+		$data['companyId'] = $company_id;
+		$result = $this->db_model->getData('au_weekends', array('companyId'=>$company_id),'','');
+		$msg = "success";
+		if(count($result)) {
+			$result = $this->db_model->UpdateForm('au_weekends', array('weekOffs'=>$days), array('companyId'=>$company_id));
+		} else {
+			// print_r($data);
+			// die;
+			$result = $this->db_model->SaveForm('au_weekends', $data);
+		}
+		if($result != true) {
+				$msg = "error";
+		}
+		echo $msg;
+	}
  
 	public function myHome(){
 		 $this->authCheck();
@@ -323,10 +455,9 @@ class Company extends CI_Controller {
 
 
 	function authCheck() {
-
 		if ($this->session->userdata('uid') != "" && $this->session->userdata("type") === "company") {
 				if($this->session->userdata("Paypal_NEXTBILLINGDATE")<date('Y-m-d'))
-		redirect('Company/upgrade_plan');
+			redirect('Company/upgrade_plan');
 		} else {
 		redirect('users/login');
 		}
@@ -341,8 +472,8 @@ class Company extends CI_Controller {
 	
  public function addUser() {
 		$this->authCheck();
-	$userId = $this->session->userdata('uid');
-		 $this->form_validation->set_rules('f_name', 'Firest Name', 'required|trim');
+		$userId = $this->session->userdata('uid');
+		$this->form_validation->set_rules('f_name', 'Firest Name', 'required|trim');
 		$this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[au_users.email]');
 		$this->form_validation->set_rules('phone_no', 'Phone No.', 'required|trim|numeric');
 		$this->form_validation->set_rules('occupation', 'Occupation', 'required|trim');
@@ -356,48 +487,43 @@ class Company extends CI_Controller {
 		$this->form_validation->set_error_delimiters('<span class="text-red">', '</span>');
 
 		if ($this->form_validation->run() == FALSE) { // validation hasn't been passed
-	 $this->load->view('company/newUser-view');
-	}elseif(!$this->checkEmployeeLimit()){
-		$this->session->set_flashdata("error", "Error:- More user not allowed with this plan.Please Upgrade Your Plan");
-		 $this->load->view('company/newUser-view');
+	 		$this->load->view('company/newUser-view');
+		}elseif(!$this->checkEmployeeLimit()){
+			$this->session->set_flashdata("error", "Error:- More user not allowed with this plan.Please Upgrade Your Plan");
+			$this->load->view('company/newUser-view');
 		} else {	
-			
-		$userInfo=$_POST;
-		$userInfo['status']=0;
-		$userInfo['company_id']=$userId;
-		$userInfo['type']='Employee';
-		$userInfo['last_login']=date("Y-m-d H:i:s");
-		$password=$this->randomPassword();
-		$userInfo['password']=md5($password);
-		
+			$userInfo=$_POST;
+			$userInfo['status']=0;
+			$userInfo['company_id']=$userId;
+			$userInfo['type']='Employee';
+			$userInfo['last_login']=date("Y-m-d H:i:s");
+			$password=$this->randomPassword();
+			$userInfo['password']=md5($password);
 			if ($this->db_model->SaveForm('au_users',$userInfo)) {
-			
-		 $this->session->set_flashdata("success", "New Employee Sucessfully Created");
-		$mailHtml="<pre>Thank you for choosing calendar Task.</pre>
-<pre>&nbsp;</pre>
-<pre>Login Details</pre>
-<pre>Email : ".$userInfo['email']."</pre>
-<pre>Password : ".$password."</pre>
-<pre>You are receiving this email because you or someone created an account for you at Augurs.in. If you did not, please disregard or email us at the email address below. This is a system generated email, please do not reply.</pre>
-<pre>&nbsp;</pre>
-<pre>To activate your account, please verify your email by clicking the link below, or paste it in your browser address bar:</pre>
-<pre>&nbsp;</pre>
-<pre><strong><a href='".site_url('validateEmail/'.$userInfo['email'])."'>Activation Link Here</a>&gt;&gt;</strong></pre>
-<pre>&nbsp;</pre>
-<pre>Thank you for your interest in Augurs.in.</pre>
-<pre>&nbsp;</pre>
-<pre>Stocksreally.com</pre>
-<p>charts | data | analysis for today&rsquo;s  investor </p>
-<pre>http://www.Augurs.in</pre>
-<pre>info@bennyapp.com</pre>";
-		$this->email_model->sendMail($userInfo['email'].",khalidhashmi13@gmail.com", "khalidhashmi13@gmail.com", "Welcome to Augurs.in", $mailHtml);
-		redirect('/company/users'); 
-
-				
+			 	$this->session->set_flashdata("success", "New Employee Sucessfully Created");
+				$mailHtml="<pre>Thank you for choosing calendar Task.</pre>";
+				$mailHtml .= "<pre>&nbsp;</pre>";
+				$mailHtml .= "<pre>Login Details</pre>";
+				$mailHtml .= "<pre>Email : ".$userInfo['email']."</pre>";
+				$mailHtml .= "<pre>Password : ".$password."</pre>";
+				$mailHtml .= "<pre>You are receiving this email because you or someone created an account for you at Augurs.in. If you did not, please disregard or email us at the email address below. This is a system generated email, please do not reply.</pre>";
+				$mailHtml .= "<pre>&nbsp;</pre>";
+				$mailHtml .= "<pre>To activate your account, please verify your email by clicking the link below, or paste it in your browser address bar:</pre>";
+				$mailHtml .= "<pre>&nbsp;</pre>";
+				$mailHtml .= "<pre><strong><a href='".site_url('validateEmail/'.$userInfo['email'])."'>Activation Link Here</a>&gt;&gt;</strong></pre>";
+				$mailHtml .= "<pre>&nbsp;</pre>";
+				$mailHtml .= "<pre>Thank you for your interest in Augurs.in.</pre>";
+				$mailHtml .= "<pre>&nbsp;</pre>";
+				$mailHtml .= "<pre>Stocksreally.com</pre>";
+				$mailHtml .= "<p>charts | data | analysis for today&rsquo;s  investor </p>";
+				$mailHtml .= "<pre>http://www.Augurs.in</pre>";
+				$mailHtml .= "<pre>info@bennyapp.com</pre>";
+				$this->email_model->sendMail($userInfo['email'].",khalidhashmi13@gmail.com", "khalidhashmi13@gmail.com", "Welcome to Augurs.in", $mailHtml);
+				redirect('/company/users'); 
 			} else {
 				$this->session->set_flashdata("error", "Error in created");
 			}
-	}
+		}
 	}
 	public function checkEmployeeLimit(){
 		$listuser=$this->db_model->getData('users',array('company_id'=>$this->session->userdata('uid')));

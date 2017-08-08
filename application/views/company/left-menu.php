@@ -30,7 +30,8 @@
           <li><a href="<?=site_url('Company/addMilestones')?>"><i class="fa fa-circle-o"></i>Add Milestones</a></li>  
         </ul>
       </li>
-      <li><a  href="<?=site_url('Company/paymenthistory')?>"><i class="fa fa-dollar"></i>Payment History</a></li>
+      <li><a href="<?=site_url('Company/paymenthistory')?>"><i class="fa fa-dollar"></i>Payment History</a></li>
+      <li><a href="<?=site_url('Company/holidays')?>"><i class="fa fa-calendar"></i>Holidays</a></li>
       <!--<li class="treeview">
           <a href="#">
             <i class="fa fa-edit"></i> <span>Reports</span>

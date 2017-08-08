@@ -4,7 +4,7 @@ $(document).ready(function() {
 	* REALTIME VALIDATION START
 	*
 	*/
-	$('.numbers-only').on('keypress', function(key) {
+	$('body').on('keypress', '.numbers-only', function(key) {
 		var str = $.trim($(this).val());
 		if(key.charCode == 48) {
 			if(!$(this).is('.allow-zero-initial') && str == "") {
@@ -40,7 +40,7 @@ $(document).ready(function() {
 				}
 			}
 		}
-	}).on('keyup', function(key) {
+	}).on('keyup', '.numbers-only', function(key) {
 		var str = $.trim($(this).val());
 		if(key.which == 8 || key.which == 46) {
 			if(str == "0" && !$(this).is('.allow-zero-initial')) {

@@ -33,11 +33,12 @@ include_once 'left-menu.php';
 		padding:0px;
 		height:100%;
 		overflow:hidden;
-	}	
-
+	}
 </style>
-<script src="<?=base_url('assets')?>/js/dhtmlxscheduler.js"></script> 
-<script src="<?=base_url('assets')?>/js/dhtmlxscheduler_agenda_view.js"></script> 
+<script src="<?=base_url('assets')?>/js/dhtmlxscheduler.js"></script>
+<script src="<?=base_url('assets')?>/js/dhtmlxscheduler_agenda_view.js"></script>
+<script src="<?=base_url('assets')?>/js/ext/dhtmlxscheduler_multiselect.js"></script>
+<script src="<?=base_url('assets')?>/js/ext/dhtmlxscheduler_editors.js"></script>
 <script>
 	function init() {
 		scheduler.config.xml_date="%Y-%m-%d %H:%i";
@@ -47,20 +48,49 @@ include_once 'left-menu.php';
 		scheduler.locale.labels.section_employee = "Employee";		
 		var employee_opts = <?php echo json_encode($Employee)?>; 
 		scheduler.locale.labels.section_select = 'Milestone';
-		var milestone_opts = <?php echo json_encode($Milestoelist)?>; 
-			
-		scheduler.config.lightbox.sections = [	
-			{name:"description", height:200, map_to:"text", type:"textarea" , focus:true},
-			{ name:"select", height:40, map_to:"milestone", type:"select", options:milestone_opts},
-			{name:"employee", height:21, map_to:"employee", type:"select", options:employee_opts},
-			{name:"time", height:72, type:"time", map_to:"auto"}	
-		];
+		var milestone_opts = <?php echo json_encode($Milestoelist)?>;
+		scheduler.templates.event_class=function(start, end, event){
+			var css = "";
+			if(event.subject) // if event has subject property then special class should be assigned
+				css += "event_"+event.subject;
+
+			if(event.id == scheduler.getState().select_id) {
+				css += " selected";
+			}
+			return css;
+		};
+
+		// creating popup
+		var milestones = [];
+		controls = [{name:"description", height:200, map_to:"text", type:"textarea" , focus:true}];
+		priorityOptions = [,];
+		// priorityOptions[0] = {'key':"",'label':""};
+		for (var i = 0; i < milestone_opts.length; i++) {
+			priorityOptions[i] = {'key':i,'label':i+1};
+		}
+		$.each(milestone_opts, function(i, value) {
+			milestones[value['key']] = value['label'];
+			controls.push({name: value['label'], map_to: "milestone"+value['key'], type: "checkbox", checked_value:value['key'], height: 40});
+			controls.push({name: value['label'] + " weight", map_to: "weight"+value['key'], type: "textarea", height: 40});
+			controls.push({name: value['label'] + " priority", height:30, map_to:"priority"+value['key'], type:"select", options:priorityOptions});
+		})
+
+		controls.push({name:"milestones", height:30, map_to:"employee", type:"select", options:milestone_opts});
+		controls.push({name:"employee", height:30, map_to:"employee", type:"select", options:employee_opts});
+		controls.push({name:"time", height:72, type:"time", map_to:"auto"});
+
+		
+		scheduler.config.lightbox.sections = controls;
+		scheduler.config.icons_select=["icon_details","icon_delete"]; //removing edit button from event option icons
 		scheduler.setLoadMode("month");
 		scheduler.load("<?=site_url('company/taskManagement')?>","json");
-		
 		var dp = new dataProcessor("<?=site_url('company/taskManagement')?>");
 		dp.init(scheduler);
 		
+		//disable events dragging to prevent accidental update in event
+		scheduler.attachEvent("onBeforeDrag", function(id, mode, e){
+			return false;
+		});
 		scheduler.attachEvent("onEventSave",function(id,ev,is_new){
 			//console.log(ev.milestone);
 			if (!ev.text) {
@@ -77,26 +107,70 @@ include_once 'left-menu.php';
 				alert("Employee must not be empty");
 				return false;
 			}
-			
-		 return true;
+			var priorities = ",";
+			var _return = true;
+			$('.dhx_wrap_section.active:nth-child(3n+1)').each(function() {
+				if(_return != false) {
+					priority = $(this).find('select').val();
+					if(priorities != "," && priority == "") {
+						alert("Priority must not be empty.");
+						_return = false;
+					} else if(~priorities.indexOf(","+priority+",")) {
+						console.log(priorities + " - " + priority);
+						alert("Two or more milestones must not have same priority");
+						_return = false;
+					}
+					priorities += priority + ",";
+				}
+			})
+			// console.log(ev);
+			// return false;
+		 return _return;
 		});
-		
-		
-		
+	    //disabling double click editing on events
+		scheduler.attachEvent("onDblClick", function(id,ev){
+		    return false;
+		});
+		// toggle lightbox view for edit and create new
+		scheduler.attachEvent("onLightbox",function(id){
+		    $('[role="dialog"]').removeClass('edit');
+			$('.dhx_cal_larea').find('input[type=checkbox]').each(function() {
+				$(this).closest('.dhx_wrap_section').addClass('newEventOption').next().addClass('newEventOption weight').next().addClass('newEventOption priority');
+			});
+		    var section = scheduler.formSection("time");
+			section.control.disabled = false;
+		    var milestone = scheduler.getEvent(id)['milestone'];
+			if($.trim(milestone) != "") {
+			    $('[role="dialog"]').addClass('edit');
+			    $('.dhx_wrap_section:nth-last-child(3) select').val(milestone);
+   				section.control.disabled = true;
+			}
+		});
+		// reseting lightbox input fields
+		scheduler.attachEvent("onAfterLightbox", function (id){
+			scheduler.resetLightbox();
+			return true;
+		});
+		// reloading page after adding new events
 		dp.attachEvent("onAfterUpdate", function(id,ev){
-			//any custom logic here
 			location.reload();
 		});
-		
-		
 	}
 	$(document).ready(function(e) {
 		$("#scheduler_here").width($(".outerc").width());
 		$("#scheduler_here").height($("body").innerHeight()-150);
 		init();
+		$('.dhx_cal_larea').find('input[type=checkbox]').each(function() {
+			$(this).closest('.dhx_wrap_section').addClass('newEventOption').next().addClass('newEventOption weight').next().addClass('newEventOption priority');
 		});
-  
-
+		$("body").on("change", ".dhx_wrap_section input[type=checkbox]", function() {
+			if($(this).prop('checked') == true) {
+				$(this).closest(".dhx_wrap_section").next().addClass('active').next().addClass('active')
+			} else {
+				$(this).closest(".dhx_wrap_section").next().removeClass('active').next().removeClass('active')
+			}
+		})
+	});
 </script>
 <?php
 include_once 'footer.php';

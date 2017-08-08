@@ -29,11 +29,10 @@ class Db_model extends CI_Model {
    */
   function SaveForm($table, $form_data) {
     $this->db->insert($table, $form_data);
-	//echo ($this->db->last_query());die; 
+    // echo $this->db->last_query(); die; 
     if ($this->db->affected_rows() == '1') {
       return TRUE;
     }
-
     return FALSE;
   }
 
@@ -99,13 +98,11 @@ class Db_model extends CI_Model {
    * @return boolean
    */
   function UpdateForm($table, $form_data, $con) {
-
     $this->db->where($con);
     $this->db->update($table, $form_data);
     if ($this->db->affected_rows() == '1') {
       return TRUE;
     }
-
     return FALSE;
   }
 

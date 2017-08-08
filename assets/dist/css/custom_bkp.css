@@ -58,32 +58,24 @@ and open the template in the editor.
 .dhx_cal_light_wide .dhx_cal_checkbox label {
 	cursor: pointer;
 }
-.dhx_wrap_section:nth-child(3n+2):not(:nth-child(1)):not(:nth-last-child(1)):not(:nth-last-child(2)):not(:nth-last-child(3)),
-.dhx_wrap_section:nth-child(3n):not(:nth-last-child(1)):not(:nth-last-child(2)):not(:nth-last-child(3)){
+.dhx_wrap_section.newEventOption{
 	width: 120px;
 	float: left;
 	box-sizing: border-box;
 }
-/* .dhx_wrap_section.newEventOption {
-	width: 120px;
-	float: left;
-	box-sizing: border-box;
-} */
-.dhx_wrap_section:nth-child(3n+2):not(:nth-child(1)):not(:nth-last-child(1)):not(:nth-last-child(2)):not(:nth-last-child(3)) .dhx_cal_lsection {
+.dhx_wrap_section.newEventOption .dhx_cal_lsection {
 	width: 90px;
 }
-.dhx_wrap_section:nth-child(3n+1):not(:nth-child(1)):not(:nth-last-child(1)):not(:nth-last-child(2)):not(:nth-last-child(3)) {
+.dhx_wrap_section.newEventOption.priority {
 	width: calc(33.333% - 180px) !important;
 	padding-left: 0 !important;
 	height: 51px;
 	padding-top: 8px;
-	float: left;
-	box-sizing: border-box;
 }
-.dhx_wrap_section:nth-child(3n+1):not(:nth-last-child(1)):not(:nth-last-child(2)):not(:nth-last-child(3)) select {
+.dhx_wrap_section.newEventOption.priority select {
 	width: 40px !important;
 }
-.dhx_wrap_section:nth-child(3n):not(:nth-last-child(2)) {
+.dhx_wrap_section.newEventOption.weight {
 	width: 60px !important;
 }
 .dhx_wrap_section.newEventOption textarea,
@@ -92,6 +84,7 @@ and open the template in the editor.
 	border: 1px solid #aaa;
 	color: #888;
 	pointer-events: none;
+	transition: all linear 0.2s;
 }
 .dhx_wrap_section.newEventOption.active textarea,
 .dhx_wrap_section.newEventOption.active select {

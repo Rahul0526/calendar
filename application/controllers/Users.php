@@ -190,10 +190,10 @@ class Users extends CI_Controller {
 		 
 				//$this->session->set_flashdata("success", "Sucessfully login");
 				//print_r($this->session->userdata);   die;          
-				redirect("company/index");
+				redirect("index.php/company/index");
 			} else {
 				$this->session->set_flashdata("error", "Invalid username & password");
-				redirect("users/login");
+				redirect("index.php/users/login");
 			}
 		}
 	}
